@@ -9,6 +9,7 @@ Desktop.ini
 idea
 .DS_Store
 *.DS_Store
+.project
 
 lib-cov
 *.seed
@@ -23,5 +24,6 @@ pids
 logs
 results
 
+#node
 node_modules
 npm-debug.log
