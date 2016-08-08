@@ -2,7 +2,7 @@ var webpack = require('webpack');
 
 module.exports = {
 	//页面入口文件配置
-    entry: "./js/main.jsx",
+    entry: "./js/main.js",
     //输出配置
     output: {
     		path:'./build',
