@@ -4,6 +4,16 @@
 
 import CONST from "./CONST.js";
 class Tools{
+    static hasProperty(o,prop){
+        return (prop in o);
+    }
+    static hasPropertyJustInSelf(o,prop){
+        return o.hasOwnProperty(prop) && !(prop in o);
+    }
+    static hasPropertyJustInPrototype(o,prop){
+        return !o.hasOwnProperty(prop) && (prop in o);
+    }
+
     static clientWidth(){
         var width = window.innerWidth; //这里要加 window，因为 IE会无效
         if (typeof width != 'number') { //如果是 IE，就使用 document

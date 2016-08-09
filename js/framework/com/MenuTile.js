@@ -1,9 +1,13 @@
 /**
- * Created by Thinkpad on 2016/3/19.
+ * Created by wind on 2016/3/19.
  */
-var twing = twing ||{ui:{},com:{},charts:{}};
-twing.com.MenuTile = (function() {
-    function MenuTile(arrItems,itemW,itemH,dir,singleCount,hGap,vGap,selectedIndex,trigger,blLoop,loopTime,boolMouseRelCon,arrRelationContainer) {
+import CONST from '../utils/CONST.js';
+import Tools from '../utils/Tools.js';
+import args from './../../libs/createjs/createjs.js';
+class MenuTile extends createjs.Container{
+    constructor(arrItems,itemW,itemH,dir,singleCount,hGap,vGap,selectedIndex,trigger,blLoop,loopTime,boolMouseRelCon,arrRelationContainer) {
+        super();
+
         if (!arrItems)return;
 
         this._arrItems = arrItems;
@@ -25,23 +29,16 @@ twing.com.MenuTile = (function() {
         this._loopFlg = 0;
 
         this._mouseRelFlag = false;
-        this._boolMouseRelCon = boolMouseRelCon;
+        this._boolMouseRelCon = boolMouseRelCon===true?true:false;
         this._arrRelationContainer = arrRelationContainer;
         this._singleCount = singleCount!=null?singleCount:10;
         this.setMouseRel();
 
         this._eventState = "auto";
-        this.initialize();
-    }
-    createjs.EventDispatcher.initialize(MenuTile.prototype);
-    var p = MenuTile.prototype = new createjs.Container();
-    p.Container_initialize = p.initialize;
-    p.initialize = function () {
-        this.Container_initialize();
+
         this.createView();
-    };
-    p.clearItem= function()
-    {
+    }
+    clearItem(){
         clearInterval(this._loopFlg);
         if(this._arrItems)
         {
@@ -51,16 +48,14 @@ twing.com.MenuTile = (function() {
             }
             this.removeAllChildren();
         }
-    };
-    p.resetItems = function(arrItems)
-    {
+    }
+    resetItems(arrItems){
         this.clearItem();
         this._arrItems = arrItems;
         this._selectedIndex = 0;
         this.createView();
-    };
-    p.resetPos = function()
-    {
+    }
+    resetPos(){
         var i,hIdx=0,vIdx=0;
         if (this._dir == "h") {
             for (i = 0; i < this._arrItems.length; i++) {
@@ -77,8 +72,8 @@ twing.com.MenuTile = (function() {
                 this._arrItems[i].y =  (this._itemH + this._vGap) * hIdx;
             }
         }
-    };
-    p.createView = function () {
+    }
+    createView(){
         var i,hIdx=0,vIdx=0;
         if (this._dir == "h") {
             for (i = 0; i < this._arrItems.length; i++) {
@@ -87,12 +82,12 @@ twing.com.MenuTile = (function() {
                 this._arrItems[i].x =  (this._itemW + this._hGap) * vIdx;
                 this._arrItems[i].y =  (this._itemH + this._vGap) * hIdx;
 
-                this._arrItems[i].setSelected(i == this._selectedIndex);
+                this._arrItems[i].selected = (i == this._selectedIndex);
                 this.addChild(this._arrItems[i]);
-                this._arrItems[i].addEventListener(this._trigger, Global.delegate(this.onTrigMenuHandler, this));
+                this._arrItems[i].addEventListener(this._trigger, this.onTrigMenuHandler);
                 if(this._trigger == "mouseover")
                 {
-                    this._arrItems[i].addEventListener("mouseout", Global.delegate(this.onUnTrigMenuHandler, this));
+                    this._arrItems[i].addEventListener("mouseout", this.onUnTrigMenuHandler);
                 }
             }
         } else {
@@ -102,46 +97,40 @@ twing.com.MenuTile = (function() {
                 this._arrItems[i].x =  (this._itemW + this._hGap) * vIdx;
                 this._arrItems[i].y =  (this._itemH + this._vGap) * hIdx;
 
-                this._arrItems[i].setSelected(i == this._selectedIndex);
+                this._arrItems[i].selected = (i == this._selectedIndex);
                 this.addChild(this._arrItems[i]);
-                this._arrItems[i].addEventListener(this._trigger, Global.delegate(this.onTrigMenuHandler, this));
+                this._arrItems[i].addEventListener(this._trigger, this.onTrigMenuHandler);
                 if(this._trigger == "mouseover")
                 {
-                    this._arrItems[i].addEventListener("mouseout", Global.delegate(this.onUnTrigMenuHandler, this));
+                    this._arrItems[i].addEventListener("mouseout", this.onUnTrigMenuHandler);
                 }
             }
         }
         this.reBeginLoop();
-    };
-    p.stopLoop = function()
-    {
+    }
+    stopLoop(){
         clearInterval(this._loopFlg);
-    };
-    p.reBeginLoop = function()
-    {
+    }
+    reBeginLoop (){
         if(this._blLoop)
         {
             clearInterval(this._loopFlg);
-            this._loopFlg = setInterval(Global.delegate(this.autoLoop,this),this._loopTime);
+            this._loopFlg = setInterval(this.autoLoop,this._loopTime);
         }
-    };
-    p.autoLoop = function()
-    {
-        if((this._boolMouseRelCon && this._mouseRelFlag == false) || this._boolMouseRelCon == false)
-        {
+    }
+    autoLoop = ()=>{
+        if((this._boolMouseRelCon && this._mouseRelFlag == false) || this._boolMouseRelCon == false){
             if(this._arrItems && this._arrItems.length>1){
                 var oldIndex = this._selectedIndex;
                 this._selectedIndex ++;
-                if(this._selectedIndex >=this._arrItems.length)
-                {
+                if(this._selectedIndex >=this._arrItems.length){
                     this._selectedIndex = 0;
                 }
-                for (i = 0; i < this._arrItems.length; i++) {
-                    this._arrItems[i].setSelected(i == this._selectedIndex);
+                for (let i = 0; i < this._arrItems.length; i++) {
+                    this._arrItems[i].selected = (i == this._selectedIndex);
                 }
 
-                if(oldIndex != this._selectedIndex)
-                {
+                if(oldIndex != this._selectedIndex){
                     this._eventState = "auto";
                     if(Tools.browserType()==CONST.BROWER_IE)
                     {
@@ -154,33 +143,31 @@ twing.com.MenuTile = (function() {
             }
         }
     };
-    p.onTrigMenuHandler = function (event) {
+    onTrigMenuHandler = (event)=>{
         this._triggerTarget = event.currentTarget;
         if(this._trigger == "mouseover"){
-            this._triggerFlg = setTimeout(Global.delegate(this.triggerRun,this),300);
+            this._triggerFlg = setTimeout(this.triggerRun,300);
         }else {
             this.triggerRun();
         }
     };
-    p.onUnTrigMenuHandler = function(event)
-    {
+    onUnTrigMenuHandler = (event) => {
         clearTimeout(this._triggerFlg);
     };
-    p.triggerRun = function()
-    {
+    triggerRun = () => {
         if(this._blLoop)
         {
             clearInterval(this._loopFlg);
-            this._loopFlg = setInterval(Global.delegate(this.autoLoop,this),this._loopTime);
+            this._loopFlg = setInterval(this.autoLoop,this._loopTime);
         }
         var oldIndex = this._selectedIndex;
         for (var i = 0; i < this._arrItems.length; i++) {
             if (this._arrItems[i] == this._triggerTarget) {
-                this._arrItems[i].setSelected(true);
+                this._arrItems[i].selected = true;
                 this._selectedIndex = i;
             }
             else {
-                this._arrItems[i].setSelected(false);
+                this._arrItems[i].selected = false;
             }
         }
         if(oldIndex != this._selectedIndex)
@@ -195,8 +182,7 @@ twing.com.MenuTile = (function() {
             }
         }
     };
-    p.setSelectedIndexWithEvent = function(idx)
-    {
+    setSelectedIndexWithEvent(idx){
         if(this._arrItems != null)
         {
             if(idx<this._arrItems.length)
@@ -204,10 +190,10 @@ twing.com.MenuTile = (function() {
                 var oldIndex = this._selectedIndex;
                 for (var i = 0; i < this._arrItems.length; i++) {
                     if(i == idx){
-                        this._arrItems[i].setSelected(true);
+                        this._arrItems[i].selected = true;
                         this._selectedIndex = i;
                     }else {
-                        this._arrItems[i].setSelected(false);
+                        this._arrItems[i].selected = false;
                     }
                 }
                 if(oldIndex != this._selectedIndex)
@@ -223,46 +209,42 @@ twing.com.MenuTile = (function() {
                 }
             }
         }
-    };
-    p.setSelectedIndexNoEvent = function(idx)
-    {
+    }
+    setSelectedIndexNoEvent(idx){
         if(this._arrItems != null)
         {
             if(idx<this._arrItems.length)
             {
                 for (var i = 0; i < this._arrItems.length; i++) {
                     if(i == idx){
-                        this._arrItems[i].setSelected(true);
+                        this._arrItems[i].selected = true;
                         this._selectedIndex = i;
                     }else {
-                        this._arrItems[i].setSelected(false);
+                        this._arrItems[i].selected = false;
                     }
                 }
             }
         }
-    };
-    p.setBoolMouseRelCon = function(bl){
+    }
+    setBoolMouseRelCon(bl){
         this.clearOldMouseRel();
         this._boolMouseRelCon = bl;
         this.setMouseRel();
-    };
-    p.setArrRelationContainer = function(arr)
-    {
+    }
+    setArrRelationContainer(arr){
         this.clearOldMouseRel();
         this._arrRelationContainer = arr;
         this.setMouseRel();
-    };
-    p.setArrRelationContainerAdd = function(arr)
-    {
+    }
+    setArrRelationContainerAdd(arr){
         this.clearOldMouseRel();
         if(this._arrRelationContainer == null){
             this._arrRelationContainer = [];
         }
         this._arrRelationContainer = this._arrRelationContainer.concat(arr);
         this.setMouseRel();
-    };
-    p.setArrRelationContainerRemove = function(arr)
-    {
+    }
+    setArrRelationContainerRemove(arr){
         this.clearOldMouseRel();
         if(this._arrRelationContainer == null){
             this._arrRelationContainer = [];
@@ -280,29 +262,27 @@ twing.com.MenuTile = (function() {
             }
         }
         this.setMouseRel();
-    };
-    p.clearOldMouseRel = function()
-    {
+    }
+    clearOldMouseRel(){
         if(this._arrRelationContainer && this._arrRelationContainer.length>0)
         {
             for(var i=0;i<this._arrRelationContainer.length;i++)
             {
-                this._arrRelationContainer[i].removeEventListener("mouseover",Global.delegate(this.openMouseRelFlag,this));
-                this._arrRelationContainer[i].removeEventListener("mouseout",Global.delegate(this.closeMouseRelFlag,this));
+                this._arrRelationContainer[i].removeEventListener("mouseover",this.openMouseRelFlag);
+                this._arrRelationContainer[i].removeEventListener("mouseout",this.closeMouseRelFlag);
             }
         }
-    };
-    p.setMouseRel = function(){
+    }
+    setMouseRel(){
         if(this._boolMouseRelCon && this._arrRelationContainer && this._arrRelationContainer.length>0)
         {
             for(var i=0;i<this._arrRelationContainer.length;i++) {
-                this._arrRelationContainer[i].addEventListener("mouseover", Global.delegate(this.openMouseRelFlag, this));
-                this._arrRelationContainer[i].addEventListener("mouseout", Global.delegate(this.closeMouseRelFlag, this));
+                this._arrRelationContainer[i].addEventListener("mouseover", this.openMouseRelFlag);
+                this._arrRelationContainer[i].addEventListener("mouseout", this.closeMouseRelFlag);
             }
         }
-    };
-    p.openMouseRelFlag = function(event)
-    {
+    }
+    openMouseRelFlag = (event)=>{
         if(this._arrRelationContainer) {
             if (this._arrRelationContainer.indexOf(event.currentTarget) != -1) {
                 if (this._boolMouseRelCon) {
@@ -311,8 +291,7 @@ twing.com.MenuTile = (function() {
             }
         }
     };
-    p.closeMouseRelFlag = function(event)
-    {
+    closeMouseRelFlag = (event)=>{
         if(this._arrRelationContainer) {
             if (this._arrRelationContainer.indexOf(event.currentTarget) != -1) {
                 if (this._boolMouseRelCon) {
@@ -322,19 +301,18 @@ twing.com.MenuTile = (function() {
         }
     };
 
-    p.getSelectedIndex = function () {
+    get selectedIndex() {
         return this._selectedIndex;
-    };
-    p.getSelectedItem = function () {
+    }
+    get selectedItem() {
         return this._arrItems[this._selectedIndex];
-    };
-    p.getMenuItems = function () {
+    }
+    get menuItems() {
         return this._arrItems;
-    };
-    p.getEventState  = function () {
+    }
+    get eventState() {
         return this._eventState;
     }
-    return MenuTile;
-})();
+}
 
-
+export default MenuTile;

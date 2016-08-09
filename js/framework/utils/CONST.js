@@ -4,7 +4,6 @@
 
 class CONST{
     constructor() {
-        super();
     }
     //浏览器常量
     static get BROWER_IE(){

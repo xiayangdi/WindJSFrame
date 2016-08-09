@@ -1,8 +1,11 @@
 /**
  * Created by wind on 2016/2/24.
  */
-import args from './../libs/createjs/createjs.js';
-
+import CONST from '../utils/CONST.js';
+import Tools from '../utils/Tools.js';
+import args from './../../libs/createjs/createjs.js';
+import Menu from './Menu.js';
+import MenuItemText from './MenuItemText.js';
 class PageList extends createjs.Container{
     constructor(pageW,pageH,listItemClass,listCount,listDir,listGap,pageGap,pageHGap,pageVGap,itemTriggle,pageTiggle) {
         super();
@@ -26,18 +29,17 @@ class PageList extends createjs.Container{
         this._listItemsPool = [];
 
         this.arrData = [];
-        this.initialize();
-    };
-    initialize() {
+
+
         this.listContainer = new createjs.Container();
         this.addChild(this.listContainer);
-        this.listMenus = new twing.com.Menu([], this._listGap,this._listDir,0,this._itemTriggle);
+        this.listMenus = new Menu([], this._listGap,this._listDir,0,this._itemTriggle);
         this.listContainer.addChild(this.listMenus);
-        this.listMenus.addEventListener("MenuChangeEvent",Global.delegate(this.onListMenuChange,this));
-        this.pageMenus = new twing.com.Menu([],this._pageGap,"h",0,this._pageTiggle);
+        this.listMenus.addEventListener("MenuChangeEvent",this.onListMenuChange);
+        this.pageMenus = new Menu([],this._pageGap,"h",0,this._pageTiggle);
         this.addChild(this.pageMenus);
-        this.pageMenus.addEventListener("MenuChangeEvent",Global.delegate(this.onPageMenuChange,this));
-        //this.createView();
+        this.pageMenus.addEventListener("MenuChangeEvent",this.onPageMenuChange);
+        this.createView();
     }
     createView() {
         this._allPage = Math.ceil(this.arrData.length/this._listCount);
@@ -65,7 +67,7 @@ class PageList extends createjs.Container{
             for(var i=0;i<cc;i++)
             {
                 s = leg + i + 1;
-                this._pageItemsPool.push(new twing.com.MenuItemText(s,15,21));
+                this._pageItemsPool.push(new MenuItemText(s,15,21));
             }
         }
     }
@@ -93,7 +95,7 @@ class PageList extends createjs.Container{
             }
         }
     }
-    onPageMenuChange(event){
+    onPageMenuChange = (event) => {
         this._currentPage = this.pageMenus.getSelectedIndex();
         this.createListMenus();
         if(Tools.browserType()==CONST.BROWER_IE)
@@ -102,15 +104,15 @@ class PageList extends createjs.Container{
         }else{
             this.dispatchEvent(new Event("ListIndexChangeEvent"));
         }
-    }
-    onListMenuChange(event){
+    };
+    onListMenuChange = (event)=>{
         if(Tools.browserType()==CONST.BROWER_IE)
         {
             this.dispatchEvent("ListIndexChangeEvent");
         }else{
             this.dispatchEvent(new Event("ListIndexChangeEvent"));
         }
-    }
+    };
     getSelectedIndex() {
         return this._currentPage*this._listCount+this.listMenus.getSelectedIndex();
     }

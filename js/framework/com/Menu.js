@@ -1,7 +1,8 @@
 /**
  * Created by wind on 2016/1/4.
  */
-
+import CONST from '../utils/CONST.js';
+import Tools from '../utils/Tools.js';
 import args from './../../libs/createjs/createjs.js';
 class Menu extends createjs.Container{
     constructor(arrItems, dis, dir, selectedIndex,trigger,blLoop,loopTime,boolMouseRelCon,arrRelationContainer) {
@@ -23,16 +24,13 @@ class Menu extends createjs.Container{
         this._loopFlg = 0;
 
         this._mouseRelFlag = false;
-        this._boolMouseRelCon = boolMouseRelCon==null?false:boolMouseRelCon;
+        this._boolMouseRelCon = boolMouseRelCon===true?true:false;
         this._arrRelationContainer = arrRelationContainer;
         this.setMouseRel();
         this._pos = 0;
 
         this.createView();
     }
-    //?????????????????????????????????????????????????
-    //createjs.EventDispatcher.initialize(Menu.prototype);
-
     clearItem () {
         clearInterval(this._loopFlg);
         if(this._arrItems)
@@ -134,7 +132,7 @@ class Menu extends createjs.Container{
                 }
             }
         }
-    }
+    };
     onTrigMenuHandler = (event)=>{
         this._triggerTarget = event.currentTarget;
         if(this._trigger == "mouseover"){
@@ -142,10 +140,10 @@ class Menu extends createjs.Container{
         }else {
             this.triggerRun();
         }
-    }
+    };
     onUnTrigMenuHandler = (event)=> {
         clearTimeout(this._triggerFlg);
-    }
+    };
     triggerRun = () => {
         if(this._blLoop)
         {
@@ -174,7 +172,7 @@ class Menu extends createjs.Container{
                 this.dispatchEvent("MenuChangeEvent");
             }
         }
-    }
+    };
     setSelectedIndexWithEvent(idx) {
         if(this._arrItems != null)
         {
@@ -288,7 +286,7 @@ class Menu extends createjs.Container{
                 }
             }
         }
-    }
+    };
     closeMouseRelFlag = (event)=> {
         if(this._arrRelationContainer) {
             if (this._arrRelationContainer.indexOf(event.currentTarget) != -1) {
@@ -297,14 +295,14 @@ class Menu extends createjs.Container{
                 }
             }
         }
-    }
-    getSelectedIndex() {
+    };
+    get selectedIndex() {
         return this._selectedIndex;
     }
-    getSelectedItem() {
+    get selectedItem() {
         return this._arrItems[this._selectedIndex];
     }
-    getMenuItems() {
+    get menuItems() {
         return this._arrItems;
     }
     getWidth() {
